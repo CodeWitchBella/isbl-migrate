@@ -4,7 +4,7 @@ import Knex from 'knex'
 async function getMigration(knex: Knex) {
   try {
     const data = await knex('migration').select()
-    return data[0].list as any[]
+    return data[0].data.list as any[]
   } catch (e) {
     if (e.code === '42P01') {
       await knex.raw('CREATE TABLE migration ( data jsonb );')
