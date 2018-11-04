@@ -131,8 +131,8 @@ export async function migrate({
     }
   }
 
-  migrations.sort(compareNames)
   // check for missing migrations
+  migrations.sort(compareNames).reverse()
   for (const remoteMigration of data) {
     if (!migrations.some(m => m.name === remoteMigration.name)) {
       console.log(`Migration ${remoteMigration.name} does not exist locally`)
@@ -143,7 +143,9 @@ export async function migrate({
       }
     }
   }
+
   // run migrations which were not run yet
+  migrations.reverse()
   for (const migration of migrations) {
     if (await handleAlreadyRun({ data, migration, knex, development })) {
       alreadyRun += 1
