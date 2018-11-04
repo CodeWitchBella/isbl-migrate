@@ -1,0 +1,36 @@
+{
+  "name": "@s-isabella/migrate",
+  "version": "0.0.0",
+  "description": "Run postgres migrations",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/isabella.skorepova/isa-scripts.git"
+  },
+  "author": "Isabella Skořepová <isabella@skorepova.info>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/isabella.skorepova/isa-scripts/issues"
+  },
+  "homepage": "https://gitlab.com/isabella.skorepova/isa-scripts#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@s-isabella/ts-utils": "^0.1.1",
+    "@types/node": "^10.12.2",
+    "@types/knex": "^0.14.26"
+  },
+  "devDependencies": {
+    "@s-isabella/scripts-backend": "^0.1.1"
+  },
+  "peerDependencies": {
+    "knex": "^0.15.2"
+  },
+  "scripts": {
+    "prepare": "isa-scripts-backend build-typedefs",
+    "check": "isa-scripts-backend check",
+    "lint": "isa-scripts-backend lint"
+  }
+}
