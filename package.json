@@ -1,6 +1,6 @@
 {
   "name": "@s-isabella/migrate",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Run postgres migrations",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -18,9 +18,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@s-isabella/ts-utils": "^0.1.1",
-    "@types/node": "^10.12.2",
-    "@types/knex": "^0.14.26"
+    "@s-isabella/ts-utils": "^0.1.2",
+    "@types/knex": "^0.14.26",
+    "@types/node": "^10.12.2"
   },
   "devDependencies": {
     "@s-isabella/scripts-backend": "^0.1.1"
