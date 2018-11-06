@@ -1,6 +1,6 @@
 {
   "name": "@s-isabella/migrate",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Run postgres migrations",
   "main": "build/index.js",
   "types": "build/index.d.ts",
