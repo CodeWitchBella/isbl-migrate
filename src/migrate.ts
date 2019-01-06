@@ -110,15 +110,14 @@ export async function migrate({
 }) {
   const migrations = await readAll(directories)
   // TODO: remove this map call once we migrate migration store everywhere
-  let data = (await getMigration(knex)).map(
-    (v: DbMigration | string) =>
-      typeof v === 'string'
-        ? (() => {
-            const migration = migrations.find(mig => mig.name === v)
-            if (migration) return migrationToDB(migration)
-            return { name: v }
-          })()
-        : v,
+  let data = (await getMigration(knex)).map((v: DbMigration | string) =>
+    typeof v === 'string'
+      ? (() => {
+          const migration = migrations.find(mig => mig.name === v)
+          if (migration) return migrationToDB(migration)
+          return { name: v }
+        })()
+      : v,
   )
   let alreadyRun = 0
 
@@ -140,6 +139,7 @@ export async function migrate({
         console.log('We are in development. Running down migration')
         await knex.raw(remoteMigration.down)
         data = data.filter(d => d !== remoteMigration)
+        await save(data, knex)
       }
     }
   }
