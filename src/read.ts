@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { promisify } from 'util'
-import { notNull } from '@s-isabella/ts-utils'
+import { notNull } from '@codewitchbella/ts-utils'
 
 async function readMigration({ fname, dir }: { fname: string; dir: string }) {
   if (/\.pgsql$/.exec(fname)) {

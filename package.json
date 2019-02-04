@@ -1,5 +1,5 @@
 {
-  "name": "@s-isabella/migrate",
+  "name": "@codewitchbella/migrate",
   "version": "0.0.8",
   "description": "Run postgres migrations",
   "main": "build/index.js",
@@ -18,12 +18,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@s-isabella/ts-utils": "^0.1.6",
+    "@codewitchbella/ts-utils": "^0.1.6",
     "@types/knex": "^0.15.1",
     "@types/node": "^10.12.15"
   },
   "devDependencies": {
-    "@s-isabella/scripts-backend": "^0.1.4"
+    "@codewitchbella/scripts-backend": "^0.1.4"
   },
   "peerDependencies": {
     "knex": "^0.15.2"
