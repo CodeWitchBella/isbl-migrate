@@ -31,9 +31,10 @@ async function readMigration({ fname, dir }: { fname: string; dir: string }) {
     return null
   }
   if (/\.js$/.exec(fname)) {
+    const mod = require(path.join(dir, fname))
     return {
       description: '<no description>',
-      ...require(path.join(dir, fname)),
+      ...('default' in mod ? mod.default : mod),
       name: fname,
     }
   }
