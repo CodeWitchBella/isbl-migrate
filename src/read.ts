@@ -33,7 +33,7 @@ async function readMigration({ fname, dir }: { fname: string; dir: string }) {
   if (/\.js$/.exec(fname)) {
     return {
       description: '<no description>',
-      ...(await import(path.join(dir, fname))).default,
+      ...require(path.join(dir, fname)),
       name: fname,
     }
   }
