@@ -113,16 +113,8 @@ export async function migrate({
       typeof d === 'string' ? { path: d, type: 'source' as 'source' } : d,
     ),
   )
-  // TODO: remove this map call once we migrate migration store everywhere
-  let data = (await getMigration(knex)).map((v: DbMigration | string) =>
-    typeof v === 'string'
-      ? (() => {
-          const migration = migrations.find(mig => mig.name === v)
-          if (migration) return migrationToDB(migration)
-          return { name: v }
-        })()
-      : v,
-  )
+
+  let data = await getMigration(knex)
   let alreadyRun = 0
 
   function printRun() {
