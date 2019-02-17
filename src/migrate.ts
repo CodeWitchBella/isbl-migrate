@@ -18,10 +18,9 @@ async function getMigration(knex: Knex) {
 
 type DbMigration = {
   name: string
-  // those wont have to be ? once we migrate migration data
-  up?: string
-  down?: string
-  description?: string
+  up: string
+  down: string
+  description: string
 }
 
 function parseName({ name }: { name: string }): [number, string] {
@@ -69,17 +68,25 @@ async function handleAlreadyRun({
     let prev = data[prevIdx]
     if (prev.up !== migration.up.toString()) {
       if (development) {
-        console.log(`Migration ${migration.name} up changed`)
-        console.log('Running down migration and following it with up again')
-        console.log('Running down')
-        await knex.raw(migration.down)
-        console.log('Running up')
-        await knex.raw(migration.up)
+        await knex.transaction(async trx => {
+          console.log(`Migration ${migration.name} up changed`)
+          console.log('Running down migration and following it with up again')
+          try {
+            console.log('Running down from database')
+            await trx.raw(prev.down)
+          } catch {
+            console.log('Down from database failed. Running down from disc')
+            await trx.raw(migration.down)
+          }
 
-        prev = migrationToDB(migration)
-        // eslint-disable-next-line no-param-reassign
-        data[prevIdx] = prev
-        await save(data, knex)
+          console.log('Running up')
+          await trx.raw(migration.up)
+
+          prev = migrationToDB(migration)
+          // eslint-disable-next-line no-param-reassign
+          data[prevIdx] = prev
+          await save(data, knex)
+        })
       } else {
         throw new Error(
           'Up migration changed! This is bad in non-development env',
