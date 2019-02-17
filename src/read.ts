@@ -3,56 +3,96 @@ import path from 'path'
 import { promisify } from 'util'
 import { notNull } from '@codewitchbella/ts-utils'
 
-async function readMigration({ fname, dir }: { fname: string; dir: string }) {
-  if (/\.pgsql$/.exec(fname)) {
-    const text = await promisify(fs.readFile)(path.join(dir, fname), 'utf-8')
+type DirType = 'source' | 'build'
+type MigrationFile = { path: string; type: DirType; name: string }
 
-    const descriptionR = /-- description: ([^\n]*)\n/.exec(text)
-    const description = descriptionR ? descriptionR[1] : '<not specified>'
+async function fileList(
+  directories: { path: string; type: DirType }[],
+): Promise<MigrationFile[]> {
+  const dirs = await Promise.all(
+    directories.map(async dir => ({
+      fnames: await promisify(fs.readdir)(dir.path),
+      dir: dir.path,
+      type: dir.type,
+    })),
+  )
+  return dirs
+    .map(d =>
+      d.fnames.map(f => ({
+        path: path.join(d.dir, f),
+        type: d.type,
+        name: f,
+      })),
+    )
+    .reduce((a, b) => a.concat(b))
+}
 
-    const upIndex = text.indexOf('-- up')
-    const downIndex = text.indexOf('-- down')
-    if (upIndex < 0) {
-      throw new Error('Up section not found')
-    }
-    if (downIndex < 0) {
-      throw new Error('Down section not found')
-    }
-    if (upIndex > downIndex) {
-      throw new Error('Up section must be before down section')
-    }
+function parsePgsql(text: string) {
+  const descriptionR = /-- description: ([^\n]*)\n/.exec(text)
+  const description = descriptionR ? descriptionR[1] : '<not specified>'
 
-    const up = text.substring(upIndex, downIndex)
-    const down = text.substring(downIndex)
-    return { up, down, description, name: fname }
+  const upIndex = text.indexOf('-- up')
+  const downIndex = text.indexOf('-- down')
+  if (upIndex < 0) {
+    throw new Error('Up section not found')
   }
-  if (/\.ts$/.exec(fname) || /\.js\.map$/.exec(fname)) {
+  if (downIndex < 0) {
+    throw new Error('Down section not found')
+  }
+  if (upIndex > downIndex) {
+    throw new Error('Up section must be before down section')
+  }
+
+  const up = text.substring(upIndex, downIndex)
+  const down = text.substring(downIndex)
+  return { up, down, description }
+}
+
+async function readMigration(
+  file: MigrationFile,
+  list: MigrationFile[],
+): Promise<{
+  name: string
+  up: string
+  down: string
+  description: string
+} | null> {
+  if (/\.pgsql$/.exec(file.path)) {
+    // read pgsql files only from source
+    // otherwise there would be risk to read them twice
+    if (file.type === 'build') return null
+
+    const text = await promisify(fs.readFile)(file.path, 'utf-8')
+    return { ...parsePgsql(text), name: file.name }
+  }
+
+  if (/\.ts$/.exec(file.path) || /\.js\.map$/.exec(file.path)) {
     // ignore those - we pick up built .js files
     return null
   }
-  if (/\.js$/.exec(fname)) {
-    const mod = require(path.join(dir, fname))
+  if (/\.js$/.exec(file.path)) {
+    // skip built .js files for which we cannot find source file
+    if (file.type === 'build') {
+      const src = file.name.replace(/\.js$/, '.ts')
+      if (!list.some(f => f.type === 'source' && f.name === src)) {
+        return null
+      }
+    }
+    const mod = await import(file.path)
+    const mig = 'default' in mod ? mod.default : mod
     return {
       description: '<no description>',
-      ...('default' in mod ? mod.default : mod),
-      name: fname,
+      ...mig,
+      name: file.name,
     }
   }
-  throw new Error(`Unknown migration file type on file "${fname}"`)
+  throw new Error(`Unknown migration file type on file "${file.path}"`)
 }
 
-async function readDir(dir: string) {
-  return (await promisify(fs.readdir)(dir)).map(fname => ({
-    fname,
-    dir,
-  }))
-}
+async function readAll(directories: { path: string; type: DirType }[]) {
+  const files = await fileList(directories)
 
-async function readAll(directories: string[]) {
-  const lists = await Promise.all(directories.map(readDir))
-  const list = lists.reduce((a, b) => a.concat(b))
-
-  const migrations = await Promise.all(list.sort().map(f => readMigration(f)))
+  const migrations = await Promise.all(files.map(f => readMigration(f, files)))
   return migrations.filter(notNull)
 }
 export default readAll

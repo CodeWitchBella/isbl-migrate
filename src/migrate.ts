@@ -104,11 +104,15 @@ export async function migrate({
   knex,
   development,
 }: {
-  directories: string[]
+  directories: (string | { path: string; type: 'source' | 'build' })[]
   knex: Knex
   development: boolean
 }) {
-  const migrations = await readAll(directories)
+  const migrations = await readAll(
+    directories.map(d =>
+      typeof d === 'string' ? { path: d, type: 'source' as 'source' } : d,
+    ),
+  )
   // TODO: remove this map call once we migrate migration store everywhere
   let data = (await getMigration(knex)).map((v: DbMigration | string) =>
     typeof v === 'string'
