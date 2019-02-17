@@ -157,7 +157,10 @@ export async function migrate({
     const print = `${migration.name}: "${migration.description}"`
     console.log(`Running migration ${print}`)
     if (typeof migration.up === 'string') {
-      await knex.raw(migration.up)
+      await knex.raw(migration.up).catch(e => {
+        console.log(migration.up)
+        throw e
+      })
     } else {
       throw new Error('Migration.up must be string')
     }
