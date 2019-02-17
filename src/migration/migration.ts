@@ -67,6 +67,11 @@ function createSpecifier() {
     },
     createTable: (name: string, columns: Columns) =>
       void list.push(createTable(name, columns)),
+    dropTable: (name: string, columns: Columns) => {
+      const v = createTable(name, columns)
+      // inverse of createTable
+      list.push({ up: v.down, down: v.up })
+    },
     alterTable: (name: string) => alterTable(name, list),
     raw: (migration: { up: string; down: string }) => void list.push(migration),
   }
