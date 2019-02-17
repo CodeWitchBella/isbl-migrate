@@ -71,13 +71,11 @@ async function handleAlreadyRun({
         await knex.transaction(async trx => {
           console.log(`Migration ${migration.name} up changed`)
           console.log('Running down migration and following it with up again')
-          try {
-            console.log('Running down from database')
-            await trx.raw(prev.down)
-          } catch {
+          console.log('Running down from database')
+          await trx.raw(prev.down).catch(() => {
             console.log('Down from database failed. Running down from disc')
-            await trx.raw(migration.down)
-          }
+            return trx.raw(migration.down)
+          })
 
           console.log('Running up')
           await trx.raw(migration.up)
