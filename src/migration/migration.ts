@@ -21,7 +21,7 @@ type Columns = (c: (name: string) => ColumnSpec) => ColumnSpec[]
 function createTable(name: string, columns: Columns) {
   const colStrings = orArray(columns(spec)).map(c => c.serialize())
 
-  const c = ['id primary key not null', ...colStrings].join(`,\n`)
+  const c = ['id serial primary key', ...colStrings].join(`,\n`)
 
   return {
     up: source`
