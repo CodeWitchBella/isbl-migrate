@@ -25,7 +25,7 @@
     "common-tags": "^1.8.0"
   },
   "devDependencies": {
-    "@codewitchbella/microbundle": "^0.9.3",
+    "@codewitchbella/microbundle": "^0.9.4",
     "@codewitchbella/scripts-backend": "^0.2.0",
     "@types/common-tags": "^1.8.0",
     "source-map-support": "^0.5.10"
