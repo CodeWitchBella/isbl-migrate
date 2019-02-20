@@ -3,8 +3,6 @@
   "version": "0.1.1",
   "description": "Run postgres migrations",
   "main": "dist/index.js",
-  "umd:main": "dist/inex.umd.js",
-  "module": "dist/index.mjs",
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
   "repository": {
@@ -29,7 +27,7 @@
   "devDependencies": {
     "@codewitchbella/scripts-backend": "^0.2.0",
     "@types/common-tags": "^1.8.0",
-    "@codewitchbella/microbundle": "^0.9.2",
+    "@codewitchbella/microbundle": "^0.9.3",
     "source-map-support": "^0.5.10"
   },
   "peerDependencies": {
