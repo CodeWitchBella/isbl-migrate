@@ -56,7 +56,7 @@ export default class ColumnSpec {
     }
 
     return [
-      c.name,
+      `"${c.name}"`,
       c.type,
       c.references ? `integer references "${c.references}" (id)` : null,
       c.nullable ? null : 'not null',
