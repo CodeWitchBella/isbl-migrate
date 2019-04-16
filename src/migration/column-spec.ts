@@ -48,16 +48,12 @@ export default class ColumnSpec {
     if (!c.type) {
       if (!c.references)
         throw this.Error('Column type nor referenced table not specified')
-      else c.type = c.references
     }
 
-    if (c.references) {
-      c.type = 'integer'
-    }
     return [
       c.name,
-      c.type ? `"${c.type}"` : null,
-      c.references ? `references "${c.references}" (id)` : null,
+      c.type,
+      c.references ? `integer references "${c.references}" (id)` : null,
       c.nullable ? null : 'not null',
       c.default !== null ? `default ${JSON.stringify(c.default)}` : null,
     ]
