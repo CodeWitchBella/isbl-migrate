@@ -5,7 +5,7 @@ const defaultSpecVal = {
   name: null as string | null,
   references: null as string | null,
   type: null as string | null,
-  default: null as string | null,
+  default: null as string | null | boolean,
 }
 type SpecVal = typeof defaultSpecVal
 export default class ColumnSpec {
@@ -23,6 +23,7 @@ export default class ColumnSpec {
   nullable = () => this.h({ nullable: true })
   references = (table: string) => this.h({ references: table })
   type = (name: string) => this.h({ type: name })
+  default = (value: string | boolean) => this.h({ default: value })
 
   Error(msg: string) {
     const err = new Error(msg)
@@ -55,10 +56,10 @@ export default class ColumnSpec {
     }
     return [
       c.name,
-      c.type,
-      c.references ? `references ${c.references} (id)` : null,
+      c.type ? `"${c.type}"` : null,
+      c.references ? `references "${c.references}" (id)` : null,
       c.nullable ? null : 'not null',
-      c.default ? `default ${c.default}` : null,
+      c.default !== null ? `default ${JSON.stringify(c.default)}` : null,
     ]
       .filter(notNull)
       .join(' ')

@@ -25,11 +25,11 @@ function createTable(name: string, columns: Columns) {
 
   return {
     up: source`
-      create table ${name} (
+      create table "${name}" (
         ${c}
       );
     `,
-    down: `drop table ${name};`,
+    down: `drop table "${name}";`,
   }
 }
 
