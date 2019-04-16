@@ -1,5 +1,10 @@
 import { notNull } from '@codewitchbella/ts-utils'
 
+function quoteValue(value: string | boolean) {
+  if (typeof value === 'boolean') return '' + value
+  return `'${value}'`
+}
+
 const defaultSpecVal = {
   nullable: false,
   name: null as string | null,
@@ -55,7 +60,7 @@ export default class ColumnSpec {
       c.type,
       c.references ? `integer references "${c.references}" (id)` : null,
       c.nullable ? null : 'not null',
-      c.default !== null ? `default ${JSON.stringify(c.default)}` : null,
+      c.default !== null ? `default ${quoteValue(c.default)}` : null,
     ]
       .filter(notNull)
       .join(' ')
