@@ -11,6 +11,7 @@ const defaultSpecVal = {
   references: null as string | null,
   type: null as string | null,
   default: null as string | null | boolean,
+  unique: false,
 }
 type SpecVal = typeof defaultSpecVal
 export default class ColumnSpec {
@@ -29,6 +30,7 @@ export default class ColumnSpec {
   references = (table: string) => this.h({ references: table })
   type = (name: string) => this.h({ type: name })
   default = (value: string | boolean) => this.h({ default: value })
+  unique = () => this.h({ unique: true })
 
   Error(msg: string) {
     const err = new Error(msg)
@@ -60,6 +62,7 @@ export default class ColumnSpec {
       c.type,
       c.references ? `integer references "${c.references}" (id)` : null,
       c.nullable ? null : 'not null',
+      c.unique ? 'unique' : null,
       c.default !== null ? `default ${quoteValue(c.default)}` : null,
     ]
       .filter(notNull)
