@@ -1,6 +1,6 @@
 {
   "name": "@codewitchbella/migrate",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Run postgres migrations",
   "main": "dist/index.js",
   "source": "src/index.ts",
@@ -19,14 +19,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@codewitchbella/ts-utils": "^0.1.13",
+    "@codewitchbella/ts-utils": "^0.1.14",
     "@types/knex": "^0.16.1",
     "@types/node": "^11.13.7",
     "common-tags": "^1.8.0"
   },
   "devDependencies": {
     "@codewitchbella/microbundle": "^0.11.1",
-    "@codewitchbella/scripts-backend": "^0.2.1",
+    "@codewitchbella/scripts-backend": "^0.2.2",
     "@types/common-tags": "^1.8.0",
     "source-map-support": "^0.5.12"
   },
