@@ -21,7 +21,7 @@
   "dependencies": {
     "@codewitchbella/ts-utils": "^0.1.13",
     "@types/knex": "^0.16.1",
-    "@types/node": "^11.13.4",
+    "@types/node": "^11.13.7",
     "common-tags": "^1.8.0"
   },
   "devDependencies": {
