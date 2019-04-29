@@ -21,13 +21,15 @@
   "dependencies": {
     "@codewitchbella/ts-utils": "^0.1.14",
     "@types/knex": "^0.16.1",
-    "@types/node": "^11.13.7",
-    "common-tags": "^1.8.0"
+    "common-tags": "^1.8.0",
+    "lodash.snakecase": "^4.1.1"
   },
   "devDependencies": {
     "@codewitchbella/microbundle": "^0.11.1",
     "@codewitchbella/scripts-backend": "^0.2.2",
     "@types/common-tags": "^1.8.0",
+    "@types/lodash.snakecase": "^4.1.6",
+    "@types/node": "^11.13.7",
     "source-map-support": "^0.5.12"
   },
   "peerDependencies": {

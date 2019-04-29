@@ -3,6 +3,7 @@ import {
   converterDefinition,
   ConverterDefinition,
 } from './converter-definition'
+import snakeCase from 'lodash.snakecase'
 
 function quoteValue(value: string | boolean) {
   if (typeof value === 'boolean') return '' + value
@@ -30,7 +31,7 @@ export default class ColumnSpec {
   private h = (o: Partial<SpecVal>) =>
     new ColumnSpec(this.stack, { ...this.spec, ...o })
 
-  name = (name: string) => this.h({ name })
+  name = (name: string) => this.h({ name: snakeCase(name) })
   nullable = () => this.h({ nullable: true })
   references = (table: string) => this.h({ references: table })
   type = (name: string) => this.h({ type: name })
