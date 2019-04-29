@@ -21,9 +21,19 @@ function orArray<T>(v: T | T[]) {
   return [v]
 }
 
+function commentQuery(table: string, column: string, comment: string | null) {
+  const start = `comment on column "${table}"."${column}"`
+  if (!comment) return `${start} is NULL;`
+  for (let i = 0; ; i++) {
+    if (!comment.includes('token' + i))
+      return `${start} is $token${i}$${comment}$token${i}$;`
+  }
+}
+
 type Columns = (c: (name: string) => ColumnSpec) => ColumnSpec[]
 function createTable(name: string, columns: Columns) {
-  const colStrings = orArray(columns(spec)).map(c => c.serialize())
+  const colDefs = orArray(columns(spec))
+  const colStrings = colDefs.map(c => c.serialize())
 
   const c = ['id serial primary key', ...colStrings].join(`,\n`)
 
@@ -32,6 +42,10 @@ function createTable(name: string, columns: Columns) {
       create table "${name}" (
         ${c}
       );
+      ${colDefs
+        .map(c => [c.getComment(), c.getName()])
+        .filter(([comment]) => !!comment)
+        .map(([comment, column]) => commentQuery(name, `${column}`, comment))}
     `,
     down: `drop table "${name}";`,
   }
@@ -45,6 +59,13 @@ function alterTable(name: string, list: { up: string; down: string }[]) {
         up: `alter table "${name}" add column ${col.serialize()};`,
         down: `alter table "${name}" drop column ${col.getName()};`,
       })
+      const comment = col.getComment()
+      if (comment) {
+        list.push({
+          up: commentQuery(name, `${col.getName()}`, comment),
+          down: '',
+        })
+      }
       return ret
     },
     dropColumn: (column: (c: (name: string) => ColumnSpec) => ColumnSpec) => {
@@ -57,24 +78,20 @@ function alterTable(name: string, list: { up: string; down: string }[]) {
     },
     alterColumn: (column: string) => {
       const setComment = (value: string | null, previous: string | null) => {
-        const query = (comment: string | null) => {
-          const start = `comment on column "${name}"."${column}"`
-          if (!comment) return `${start} is NULL`
-          for (let i = 0; ; i++) {
-            if (!comment.includes('token' + i))
-              return `${start} is $token${i}$${comment}$token${i}$`
-          }
-        }
-        list.push({ up: query(value), down: query(previous) })
+        list.push({
+          up: commentQuery(name, column, value),
+          down: commentQuery(name, column, previous),
+        })
       }
       const setConverter = (
         definition: ConverterDefinition | null,
         prev: ConverterDefinition | null,
-      ) =>
+      ) => {
         setComment(
           definition !== null ? converterDefinition(definition) : null,
           prev !== null ? converterDefinition(prev) : null,
         )
+      }
       return { setComment, setConverter }
     },
   }
