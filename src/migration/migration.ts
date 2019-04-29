@@ -1,5 +1,9 @@
 import { source } from 'common-tags'
 import ColumnSpec from './column-spec'
+import {
+  ConverterDefinition,
+  converterDefinition,
+} from './converter-definition'
 
 type Specifier = ReturnType<typeof createSpecifier>['specifier']
 type MigrationSpecification = (t: Specifier) => void
@@ -38,18 +42,40 @@ function alterTable(name: string, list: { up: string; down: string }[]) {
     addColumn: (column: (c: (name: string) => ColumnSpec) => ColumnSpec) => {
       const col = column(spec)
       list.push({
-        up: `alter table ${name} add column ${col.serialize()};`,
-        down: `alter table ${name} drop column ${col.getName()};`,
+        up: `alter table "${name}" add column ${col.serialize()};`,
+        down: `alter table "${name}" drop column ${col.getName()};`,
       })
       return ret
     },
     dropColumn: (column: (c: (name: string) => ColumnSpec) => ColumnSpec) => {
       const col = column(spec)
       list.push({
-        up: `alter table ${name} drop column ${col.getName()};`,
-        down: `alter table ${name} add column ${col.serialize()};`,
+        up: `alter table "${name}" drop column ${col.getName()};`,
+        down: `alter table "${name}" add column ${col.serialize()};`,
       })
       return ret
+    },
+    alterColumn: (column: string) => {
+      const setComment = (value: string | null, previous: string | null) => {
+        const query = (comment: string | null) => {
+          const start = `comment on column "${name}"."${column}"`
+          if (!comment) return `${start} is NULL`
+          for (let i = 0; ; i++) {
+            if (!comment.includes('token' + i))
+              return `${start} is $token${i}$${comment}$token${i}$`
+          }
+        }
+        list.push({ up: query(value), down: query(previous) })
+      }
+      const setConverter = (
+        definition: ConverterDefinition | null,
+        prev: ConverterDefinition | null,
+      ) =>
+        setComment(
+          definition !== null ? converterDefinition(definition) : null,
+          prev !== null ? converterDefinition(prev) : null,
+        )
+      return { setComment, setConverter }
     },
   }
   return ret

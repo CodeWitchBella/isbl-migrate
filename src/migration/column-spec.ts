@@ -1,4 +1,8 @@
 import { notNull } from '@codewitchbella/ts-utils'
+import {
+  converterDefinition,
+  ConverterDefinition,
+} from './converter-definition'
 
 function quoteValue(value: string | boolean) {
   if (typeof value === 'boolean') return '' + value
@@ -12,6 +16,7 @@ const defaultSpecVal = {
   type: null as string | null,
   default: null as string | null | boolean,
   unique: false,
+  comment: null as string | null,
 }
 type SpecVal = typeof defaultSpecVal
 export default class ColumnSpec {
@@ -31,6 +36,9 @@ export default class ColumnSpec {
   type = (name: string) => this.h({ type: name })
   default = (value: string | boolean) => this.h({ default: value })
   unique = () => this.h({ unique: true })
+  comment = (value: string) => this.h({ comment: value })
+  converter = (definition: ConverterDefinition) =>
+    this.comment(converterDefinition(definition))
 
   Error(msg: string) {
     const err = new Error(msg)
@@ -71,5 +79,9 @@ export default class ColumnSpec {
 
   getName() {
     return this.spec.name
+  }
+
+  getComment() {
+    return this.spec.comment
   }
 }
