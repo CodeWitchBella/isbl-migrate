@@ -29,7 +29,7 @@
     "@codewitchbella/scripts-backend": "^0.2.2",
     "@types/common-tags": "^1.8.0",
     "@types/lodash.snakecase": "^4.1.6",
-    "@types/node": "^11.13.7",
+    "@types/node": "^12.6.8",
     "source-map-support": "^0.5.12"
   },
   "peerDependencies": {
