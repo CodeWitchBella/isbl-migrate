@@ -6,7 +6,7 @@ import {
 } from './converter-definition'
 
 type Specifier = ReturnType<typeof createSpecifier>['specifier']
-type MigrationSpecification = (t: Specifier) => void
+type MigrationSpecification = (t: Specifier) => void | Promise<void>
 
 const env = process.env.NODE_ENV
 function spec(name: string) {
@@ -126,9 +126,9 @@ function createSpecifier() {
   }
 }
 
-export function migration(specification: MigrationSpecification) {
+export async function migration(specification: MigrationSpecification) {
   const { list, specifier, description } = createSpecifier()
-  specification(specifier)
+  await specification(specifier)
   return {
     description: description.value || 'No description specified',
     up: list.map(v => v.up).join('\n'),
