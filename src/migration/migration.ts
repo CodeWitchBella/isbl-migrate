@@ -33,7 +33,7 @@ function commentQuery(table: string, column: string, comment: string | null) {
 type Columns = (c: (name: string) => ColumnSpec) => ColumnSpec[]
 function createTable(name: string, columns: Columns) {
   const colDefs = orArray(columns(spec))
-  const colStrings = colDefs.map(c => c.serialize())
+  const colStrings = colDefs.map((c) => c.serialize())
 
   const c = ['id serial primary key', ...colStrings].join(`,\n`)
 
@@ -43,7 +43,7 @@ function createTable(name: string, columns: Columns) {
         ${c}
       );
       ${colDefs
-        .map(c => [c.getComment(), c.getName()])
+        .map((c) => [c.getComment(), c.getName()])
         .filter(([comment]) => !!comment)
         .map(([comment, column]) => commentQuery(name, `${column}`, comment))}
     `,
@@ -131,9 +131,9 @@ export async function migration(specification: MigrationSpecification) {
   await specification(specifier)
   return {
     description: description.value || 'No description specified',
-    up: list.map(v => v.up).join('\n'),
+    up: list.map((v) => v.up).join('\n'),
     down: list
-      .map(v => v.down)
+      .map((v) => v.down)
       .reverse()
       .join('\n'),
   }

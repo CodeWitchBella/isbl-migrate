@@ -65,7 +65,7 @@ async function handleAlreadyRun({
   knex: Knex
   last: boolean
 }) {
-  const prevIdx = data.findIndex(mig => mig.name === migration.name)
+  const prevIdx = data.findIndex((mig) => mig.name === migration.name)
   if (prevIdx >= 0) {
     let prev = data[prevIdx]
     // only test the last migration because codegen could easily change and if
@@ -73,7 +73,7 @@ async function handleAlreadyRun({
     if (last) {
       if (prev.up !== migration.up.toString()) {
         if (development) {
-          await knex.transaction(async trx => {
+          await knex.transaction(async (trx) => {
             console.log(`Migration ${migration.name} up changed`)
             console.log('Running down migration and following it with up again')
             console.log('Running down from database')
@@ -120,7 +120,7 @@ export async function migrate({
   development: boolean
 }) {
   const migrations = await readAll(
-    directories.map(d =>
+    directories.map((d) =>
       typeof d === 'string' ? { path: d, type: 'source' as 'source' } : d,
     ),
   )
@@ -140,12 +140,12 @@ export async function migrate({
   // check for missing migrations
   migrations.sort(compareNames).reverse()
   for (const remoteMigration of data) {
-    if (!migrations.some(m => m.name === remoteMigration.name)) {
+    if (!migrations.some((m) => m.name === remoteMigration.name)) {
       console.log(`Migration ${remoteMigration.name} does not exist locally`)
       if (development && 'down' in remoteMigration) {
         console.log('We are in development. Running down migration')
         await knex.raw(remoteMigration.down)
-        data = data.filter(d => d !== remoteMigration)
+        data = data.filter((d) => d !== remoteMigration)
         await save(data, knex)
       }
     }
@@ -173,7 +173,7 @@ export async function migrate({
     const print = `${migration.name}: "${migration.description}"`
     console.log(`Running migration ${print}`)
     if (typeof migration.up === 'string') {
-      await knex.raw(migration.up).catch(e => {
+      await knex.raw(migration.up).catch((e) => {
         console.log(migration.up)
         throw e
       })

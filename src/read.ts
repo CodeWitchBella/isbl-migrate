@@ -10,15 +10,15 @@ async function fileList(
   directories: { path: string; type: DirType }[],
 ): Promise<MigrationFile[]> {
   const dirs = await Promise.all(
-    directories.map(async dir => ({
+    directories.map(async (dir) => ({
       fnames: await promisify(fs.readdir)(dir.path),
       dir: dir.path,
       type: dir.type,
     })),
   )
   return dirs
-    .map(d =>
-      d.fnames.map(f => ({
+    .map((d) =>
+      d.fnames.map((f) => ({
         path: path.join(d.dir, f),
         type: d.type,
         name: f,
@@ -74,7 +74,7 @@ async function readMigration(
     // skip built .js files for which we cannot find source file
     if (file.type === 'build') {
       const src = file.name.replace(/\.js$/, '.ts')
-      if (!list.some(f => f.type === 'source' && f.name === src)) {
+      if (!list.some((f) => f.type === 'source' && f.name === src)) {
         return null
       }
     }
@@ -92,7 +92,9 @@ async function readMigration(
 async function readAll(directories: { path: string; type: DirType }[]) {
   const files = await fileList(directories)
 
-  const migrations = await Promise.all(files.map(f => readMigration(f, files)))
+  const migrations = await Promise.all(
+    files.map((f) => readMigration(f, files)),
+  )
   return migrations.filter(notNull)
 }
 export default readAll
