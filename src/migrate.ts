@@ -1,5 +1,5 @@
 import readAll from './read'
-import Knex from 'knex'
+import { Knex } from 'knex'
 
 async function getMigration(knex: Knex) {
   try {
