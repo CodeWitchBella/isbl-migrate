@@ -5,8 +5,19 @@ import {
   ConverterDefinition,
 } from './converter-definition'
 
-function quoteValue(value: string | boolean) {
+function quoteValue(value: string | boolean | number) {
+  if (typeof value === 'number') {
+    // TODO: figure out if other values make sense. For now this is here to serve
+    // as a sanity check
+    if (Number.isSafeInteger(value)) return `${value}`
+    if (!Number.isFinite(value)) throw new Error('cannot deal with infinities')
+    const str = value.toFixed(4)
+    if (Number.parseFloat(str) !== value)
+      throw new Error('Cannot safely convert this')
+    return str
+  }
   if (typeof value === 'boolean') return `${value}`
+  if (value.includes("'")) throw new Error("Cannot serialize string with '")
   return `'${value}'`
 }
 
@@ -15,7 +26,7 @@ const defaultSpecVal = {
   name: null as string | null,
   references: null as string | null,
   type: null as string | null,
-  default: null as string | null | boolean,
+  default: null as string | null | boolean | number,
   unique: false,
   comment: null as string | null,
 }
@@ -35,7 +46,7 @@ export default class ColumnSpec {
   nullable = () => this.h({ nullable: true })
   references = (table: string) => this.h({ references: table })
   type = (name: string) => this.h({ type: name })
-  default = (value: string | boolean) => this.h({ default: value })
+  default = (value: string | boolean | number) => this.h({ default: value })
   unique = () => this.h({ unique: true })
   comment = (value: string) => this.h({ comment: value })
   converter = (definition: ConverterDefinition) =>
