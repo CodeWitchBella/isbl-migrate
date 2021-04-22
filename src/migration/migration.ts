@@ -25,7 +25,7 @@ function commentQuery(table: string, column: string, comment: string | null) {
   const start = `comment on column "${table}"."${column}"`
   if (!comment) return `${start} is NULL;`
   for (let i = 0; ; i++) {
-    if (!comment.includes('token' + i))
+    if (!comment.includes(`token${i}`))
       return `${start} is $token${i}$${comment}$token${i}$;`
   }
 }
@@ -100,7 +100,7 @@ function alterTable(name: string, list: { up: string; down: string }[]) {
 
 function createSpecifier() {
   const list = [] as { up: string; down: string }[]
-  let desc = { value: null as string | null }
+  const desc = { value: null as string | null }
 
   const specifier = {
     description: (description: string) => {

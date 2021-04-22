@@ -155,7 +155,7 @@ export async function migrate({
   migrations.reverse()
   let i = 0
   for (const migration of migrations) {
-    i++
+    i += 1
     if (
       await handleAlreadyRun({
         data,

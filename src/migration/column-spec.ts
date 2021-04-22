@@ -1,12 +1,12 @@
 import { notNull } from '@codewitchbella/ts-utils'
+import snakeCase from 'lodash.snakecase'
 import {
   converterDefinition,
   ConverterDefinition,
 } from './converter-definition'
-import snakeCase from 'lodash.snakecase'
 
 function quoteValue(value: string | boolean) {
-  if (typeof value === 'boolean') return '' + value
+  if (typeof value === 'boolean') return `${value}`
   return `'${value}'`
 }
 
