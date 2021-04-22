@@ -81,7 +81,7 @@ async function handleAlreadyRun({
           }
           const config = {
             knex,
-            up: migration.down,
+            up: migration.up,
             finish,
           }
           console.log(`Migration ${migration.name} up changed`)
@@ -113,7 +113,7 @@ async function handleAlreadyRun({
   return false
 }
 
-function runDownAndUp(
+async function runDownAndUp(
   down: string,
   {
     knex,
@@ -124,23 +124,27 @@ function runDownAndUp(
     up: string
     finish: (trx: Knex) => Promise<void>
   },
-) {
-  return knex.transaction(async (trx) => {
-    const downError = await trx.raw(down).then(
-      () => false,
-      (e) => e,
-    )
-    if (downError) {
-      await trx.rollback()
-      return downError
+): Promise<Error | false> {
+  try {
+    await knex.transaction(async (trx) => {
+      await trx.raw(down).catch((e) => {
+        e.downError = true
+        throw e
+      })
+
+      console.log('Running up')
+      await trx.raw(up)
+
+      await finish(trx)
+    })
+  } catch (e) {
+    if (e.downError) {
+      delete e.downError
+      return e
     }
-
-    console.log('Running up')
-    await trx.raw(up)
-
-    await finish(trx)
-    return false
-  })
+    throw e
+  }
+  return false
 }
 
 export async function migrate({
