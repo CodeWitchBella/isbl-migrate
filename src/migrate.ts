@@ -130,7 +130,10 @@ function runDownAndUp(
       () => false,
       (e) => e,
     )
-    if (downError) return downError
+    if (downError) {
+      await trx.rollback()
+      return downError
+    }
 
     console.log('Running up')
     await trx.raw(up)
