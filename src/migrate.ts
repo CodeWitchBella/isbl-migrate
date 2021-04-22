@@ -1,5 +1,5 @@
-import readAll from './read'
 import { Knex } from 'knex'
+import readAll from './read'
 
 async function getMigration(knex: Knex) {
   try {
@@ -73,23 +73,26 @@ async function handleAlreadyRun({
     if (last) {
       if (prev.up !== migration.up.toString()) {
         if (development) {
-          await knex.transaction(async (trx) => {
-            console.log(`Migration ${migration.name} up changed`)
-            console.log('Running down migration and following it with up again')
-            console.log('Running down from database')
-            await trx.raw(prev.down).catch(() => {
-              console.log('Down from database failed. Running down from disc')
-              return trx.raw(migration.down)
-            })
-
-            console.log('Running up')
-            await trx.raw(migration.up)
-
+          const finish = async (trx: Knex) => {
             prev = migrationToDB(migration)
             // eslint-disable-next-line no-param-reassign
             data[prevIdx] = prev
-            await save(data, knex)
-          })
+            await save(data, trx)
+          }
+          const config = {
+            knex,
+            up: migration.down,
+            finish,
+          }
+          console.log(`Migration ${migration.name} up changed`)
+          console.log('Running down migration and following it with up again')
+          console.log('Running down from database')
+          const error = await runDownAndUp(prev.down, config)
+          if (error) {
+            console.log('Down from database failed. Running down from disc')
+            const error2 = await runDownAndUp(migration.down, config)
+            if (error2) throw error2
+          }
         } else {
           throw new Error(
             'Up migration changed! This is bad in non-development env',
@@ -108,6 +111,33 @@ async function handleAlreadyRun({
     return true
   }
   return false
+}
+
+function runDownAndUp(
+  down: string,
+  {
+    knex,
+    up,
+    finish,
+  }: {
+    knex: Knex
+    up: string
+    finish: (trx: Knex) => Promise<void>
+  },
+) {
+  return knex.transaction(async (trx) => {
+    const downError = await trx.raw(down).then(
+      () => false,
+      (e) => e,
+    )
+    if (downError) return downError
+
+    console.log('Running up')
+    await trx.raw(up)
+
+    await finish(trx)
+    return false
+  })
 }
 
 export async function migrate({
