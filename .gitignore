@@ -1,6 +1,5 @@
 node_modules
 package-lock.json
-yarn.lock
 dist
 .rts2_cache*
 *.tgz
