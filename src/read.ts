@@ -78,7 +78,7 @@ async function readMigration(
         return null
       }
     }
-    const mod = require(file.path)
+    const mod = await import(file.path)
     const mig = await ('default' in mod ? mod.default : mod)
     return {
       description: '<no description>',
