@@ -6,7 +6,7 @@
     "declaration": true,
     "strict": true,
     //"noUncheckedIndexedAccess": true,
-
+    "useUnknownInCatchVariables": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,

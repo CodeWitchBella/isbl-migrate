@@ -1,5 +1,5 @@
 import { notNull } from '@codewitchbella/ts-utils'
-import snakeCase from 'lodash.snakecase'
+import snakeCase from 'lodash/snakeCase.js'
 import {
   converterDefinition,
   ConverterDefinition,
